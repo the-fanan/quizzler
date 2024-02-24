@@ -11,28 +11,35 @@ class QuizzPage extends StatefulWidget {
   State<QuizzPage> createState() => _QuizzPageState();
 }
 
+class Question {
+  final String question;
+  final bool answer;
+
+  const Question({this.question = '', this.answer = false});
+}
+
 class _QuizzPageState extends State<QuizzPage> {
   List<Icon> scoreKeeper = [];
-  static const List<Map<String, Object>> questions = [
-    {
-      'question': 'You can lead a cow down stairs but not up stairs',
-      'answer': false,
-    },
-    {
-      'question': 'Approximately one quarter of human bones are in the feet',
-      'answer': true,
-    },
-    {
-      'question': 'A slug\'s blood is green',
-      'answer': true,
-    },
+  static const List<Question> questions = [
+    Question(
+      question: 'You can lead a cow down stairs but not up stairs',
+      answer: false,
+    ),
+    Question(
+      question: 'Approximately one quarter of human bones are in the feet',
+      answer: true,
+    ),
+    Question(
+      question: 'A slug\'s blood is green',
+      answer: true,
+    ),
   ];
   int currentQuestionIndex = 0;
-  String question = questions[0]['question'].toString();
+  String question = questions[0].question;
 
   void handleAnswer(bool answer) {
-    Map<String, Object> currentQuestion = questions[currentQuestionIndex];
-    bool expectedAnswer = currentQuestion['answer'].toString() == 'true';
+    Question currentQuestion = questions[currentQuestionIndex];
+    bool expectedAnswer = currentQuestion.answer;
     Color color = Colors.red;
     IconData icon = Icons.close;
 
@@ -43,7 +50,7 @@ class _QuizzPageState extends State<QuizzPage> {
 
     setState(() {
       currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
-      question = questions[currentQuestionIndex]['question'].toString();
+      question = questions[currentQuestionIndex].question;
       scoreKeeper.add(Icon(
         icon,
         color: color,
@@ -131,7 +138,7 @@ class _QuizzPageState extends State<QuizzPage> {
                 setState(() {
                   currentQuestionIndex = 0;
                   scoreKeeper = [];
-                  question = questions[0]['question'].toString();
+                  question = questions[0].question;
                 });
               },
             ),
