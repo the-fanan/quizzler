@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() {
   runApp(const Quizzler());
@@ -35,9 +36,10 @@ class _QuizzPageState extends State<QuizzPage> {
     ),
   ];
   int currentQuestionIndex = 0;
+  int correctQuestions = 0;
   String question = questions[0].question;
 
-  void handleAnswer(bool answer) {
+  void handleAnswer(BuildContext context, bool answer) {
     Question currentQuestion = questions[currentQuestionIndex];
     bool expectedAnswer = currentQuestion.answer;
     Color color = Colors.red;
@@ -46,15 +48,49 @@ class _QuizzPageState extends State<QuizzPage> {
     if (answer == expectedAnswer) {
       color = Colors.green;
       icon = Icons.check;
+      correctQuestions++;
     }
 
     setState(() {
-      currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+      currentQuestionIndex = currentQuestionIndex + 1;
+
+      if (currentQuestionIndex >= questions.length) {
+        Alert(
+          context: context,
+          title: 'End Of Questions',
+          desc:
+              'You have reached the end of the questions. You got $correctQuestions of ${questions.length} questions correct!',
+          buttons: [
+            DialogButton(
+              color: Colors.red,
+              onPressed: () {
+                resetState();
+                Navigator.pop(context);
+              },
+              width: 120,
+              child: const Text(
+                "Close",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            )
+          ],
+        ).show();
+      }
+
       question = questions[currentQuestionIndex].question;
       scoreKeeper.add(Icon(
         icon,
         color: color,
       ));
+    });
+  }
+
+  void resetState() {
+    setState(() {
+      currentQuestionIndex = 0;
+      scoreKeeper = [];
+      question = questions[0].question;
+      correctQuestions = 0;
     });
   }
 
@@ -95,7 +131,7 @@ class _QuizzPageState extends State<QuizzPage> {
                 ),
               ),
               onPressed: () {
-                handleAnswer(true);
+                handleAnswer(context, true);
               },
             ),
           ),
@@ -115,7 +151,7 @@ class _QuizzPageState extends State<QuizzPage> {
                 ),
               ),
               onPressed: () {
-                handleAnswer(false);
+                handleAnswer(context, false);
               },
             ),
           ),
@@ -135,11 +171,7 @@ class _QuizzPageState extends State<QuizzPage> {
                 ),
               ),
               onPressed: () {
-                setState(() {
-                  currentQuestionIndex = 0;
-                  scoreKeeper = [];
-                  question = questions[0].question;
-                });
+                resetState();
               },
             ),
           ),
